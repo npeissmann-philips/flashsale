@@ -3,6 +3,7 @@ package com.self.study.flashsale.flashsale.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.self.study.flashsale.flashsale.adapters.gateway.EventsGateway;
 import com.self.study.flashsale.flashsale.adapters.gateway.OrdersGateway;
 import com.self.study.flashsale.flashsale.application.useCase.orders.DeleteOrder;
 import com.self.study.flashsale.flashsale.application.useCase.orders.DeleteOrderImpl;
@@ -17,8 +18,8 @@ import com.self.study.flashsale.flashsale.application.useCase.orders.SaveOrderIm
 public class OrdersConfig {
 
     @Bean
-    public SaveOrder saveOrder(OrdersGateway ordersGateway) {
-        return new SaveOrderImpl(ordersGateway);
+    public SaveOrder saveOrder(OrdersGateway ordersGateway, EventsGateway eventsGateway) {
+        return new SaveOrderImpl(ordersGateway, eventsGateway);
     }
 
     @Bean
