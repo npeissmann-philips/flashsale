@@ -4,10 +4,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import com.self.study.flashsale.flashsale.domain.models.Orders;
+import com.self.study.flashsale.flashsale.domain.models.Events;
 import com.self.study.flashsale.flashsale.drivers.db.entities.enums.OrderStatus;
 
 public class OrdersRequest {
-    private EventRequest eventId;
+    private UUID eventId;
     private UUID id;
     private LocalDate orderDate;
     private OrderStatus status;
@@ -16,7 +17,7 @@ public class OrdersRequest {
     public OrdersRequest() {
     }
 
-    public OrdersRequest(EventRequest eventId, UUID id, LocalDate orderDate, OrderStatus status, UUID userId) {
+    public OrdersRequest(UUID eventId, UUID id, LocalDate orderDate, OrderStatus status, UUID userId) {
         this.eventId = eventId;
         this.id = id;
         this.orderDate = orderDate;
@@ -24,7 +25,7 @@ public class OrdersRequest {
         this.userId = userId;
     }
 
-    public EventRequest getEventId() {
+    public UUID getEventId() {
         return eventId;
     }
 
@@ -47,7 +48,7 @@ public class OrdersRequest {
     public Orders toDomain() {
         return Orders.builder()
                 .id(id)
-                .eventId(eventId.toDomain())
+                .eventId(Events.builder().id(eventId).build())
                 .userId(userId)
                 .orderDate(orderDate)
                 .status(status)
