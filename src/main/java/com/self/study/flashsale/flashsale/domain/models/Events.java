@@ -11,16 +11,18 @@ public class Events {
     private LocalDate eventDate;
     private int totalCapacity;
     private int remainingCapacity;
+    private Long version;
 
     public Events() {
     }
 
-    public Events(UUID id, String name, LocalDate eventDate, int totalCapacity, int remainingCapacity) {
+    public Events(UUID id, String name, LocalDate eventDate, int totalCapacity, int remainingCapacity, Long version) {
         this.id = id;
         this.name = name;
         this.eventDate = eventDate;
         this.totalCapacity = totalCapacity;
         this.remainingCapacity = remainingCapacity;
+        this.version = version;
     }
 
     public Events(EventsEntity eventsEntity) {
@@ -29,6 +31,7 @@ public class Events {
         this.eventDate = eventsEntity.getEventDate();
         this.totalCapacity = eventsEntity.getTotalCapacity();
         this.remainingCapacity = eventsEntity.getRemainingCapacity();
+        this.version = eventsEntity.getVersion();
     }
 
     public UUID getId() {
@@ -71,6 +74,14 @@ public class Events {
         this.remainingCapacity = remainingCapacity;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     public EventsEntity toEntity() {
         return new EventsEntity(this);
     }
@@ -85,6 +96,7 @@ public class Events {
         private LocalDate eventDate;
         private int totalCapacity;
         private int remainingCapacity;
+        private Long version;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -111,8 +123,13 @@ public class Events {
             return this;
         }
 
+        public Builder version(Long version) {
+            this.version = version;
+            return this;
+        }
+
         public Events build() {
-            return new Events(id, name, eventDate, totalCapacity, remainingCapacity);
+            return new Events(id, name, eventDate, totalCapacity, remainingCapacity, version);
         }
     }
 }

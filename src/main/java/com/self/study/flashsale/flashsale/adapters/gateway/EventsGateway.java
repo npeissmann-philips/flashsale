@@ -10,6 +10,8 @@ public interface EventsGateway {
 
     Events findById(UUID id);
 
+    Events findByIdForUpdate(UUID id);
+
     void delete(UUID id);
 
     List<Events> findAll();
