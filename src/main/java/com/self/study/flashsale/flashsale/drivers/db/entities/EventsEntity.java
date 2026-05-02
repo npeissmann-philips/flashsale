@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "events")
@@ -18,6 +19,8 @@ public class EventsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Version
+    private Long version;
     private String name;
     private LocalDate eventDate;
     private int totalCapacity;
@@ -32,14 +35,16 @@ public class EventsEntity {
         this.eventDate = events.getEventDate();
         this.totalCapacity = events.getTotalCapacity();
         this.remainingCapacity = events.getRemainingCapacity();
+        this.version = events.getVersion();
     }
 
-    public EventsEntity(UUID id, String name, LocalDate eventDate, int totalCapacity, int remainingCapacity) {
+    public EventsEntity(UUID id, String name, LocalDate eventDate, int totalCapacity, int remainingCapacity, Long version) {
         this.id = id;
         this.name = name;
         this.eventDate = eventDate;
         this.totalCapacity = totalCapacity;
         this.remainingCapacity = remainingCapacity;
+        this.version = version;
     }
 
     public UUID getId() {
@@ -80,6 +85,14 @@ public class EventsEntity {
 
     public void setRemainingCapacity(int remainingCapacity) {
         this.remainingCapacity = remainingCapacity;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public Events toDomain() {

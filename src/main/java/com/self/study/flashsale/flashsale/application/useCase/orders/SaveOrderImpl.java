@@ -5,6 +5,8 @@ import com.self.study.flashsale.flashsale.adapters.gateway.OrdersGateway;
 import com.self.study.flashsale.flashsale.domain.models.Events;
 import com.self.study.flashsale.flashsale.domain.models.Orders;
 
+import jakarta.transaction.Transactional;
+
 public class SaveOrderImpl implements SaveOrder {
 
     private final OrdersGateway ordersGateway;
@@ -16,12 +18,14 @@ public class SaveOrderImpl implements SaveOrder {
     }
 
     @Override
+    @Transactional
     public Orders execute(Orders order) {
-        Events events = eventsGateway.findById(order.getEventId().getId());
+
+        Events events = eventsGateway.findByIdForUpdate(order.getEventId().getId());
+        events.setRemainingCapacity(events.getRemainingCapacity() - 1);
         if (events.getRemainingCapacity() < 0) {
             throw new RuntimeException("Event is full");
         }
-        events.setRemainingCapacity(events.getRemainingCapacity() - 1);
         eventsGateway.save(events);
         order.setEventId(events);
         return ordersGateway.save(order);

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import com.self.study.flashsale.flashsale.adapters.controllers.OrdersController;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
@@ -51,5 +54,10 @@ public class OrdersWebController {
     @Operation(summary = "Delete an order by id")
     public void delete(@PathVariable UUID id) {
         ordersController.delete(id);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<String> handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException e) {
+        return ResponseEntity.status(409).body("The event was modified by another transaction. Please try again.");
     }
 }

@@ -27,6 +27,11 @@ public class EventsGatewayImpl implements EventsGateway {
     }
 
     @Override
+    public Events findByIdForUpdate(UUID id) {
+        return eventsRepository.findByIdForUpdate(id).map(EventsEntity::toDomain).orElse(null);
+    }
+
+    @Override
     public void delete(UUID id) {
         eventsRepository.deleteById(id);
     }
