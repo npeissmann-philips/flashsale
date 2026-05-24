@@ -18,6 +18,8 @@ import com.self.study.flashsale.flashsale.adapters.controllers.OrdersController;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersResponse;
 
+import com.self.study.flashsale.flashsale.drivers.messaging.producer.OrdersProducer;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -26,16 +28,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Orders")
 public class OrdersWebController {
 
-    OrdersController ordersController;
+    private final OrdersController ordersController;
+    private final OrdersProducer ordersProducer;
 
-    public OrdersWebController(OrdersController ordersController) {
+    public OrdersWebController(OrdersController ordersController, OrdersProducer ordersProducer) {
         this.ordersController = ordersController;
+        this.ordersProducer = ordersProducer;
     }
 
     @PostMapping
     @Operation(summary = "Save an order")
-    public OrdersResponse save(@RequestBody OrdersRequest ordersRequest) {
-        return ordersController.save(ordersRequest);
+    public ResponseEntity<String> save(@RequestBody OrdersRequest ordersRequest) {
+        ordersProducer.sendOrderRequest(ordersRequest);
+        return ResponseEntity.accepted().body("Order request accepted for processing");
     }
 
     @GetMapping("/{id}")
