@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -45,18 +49,24 @@ public class OrdersWebController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Find an order by id")
-    public OrdersResponse findById(@PathVariable UUID id) {
+    @Cacheable(value = "orders", key = "#id")
+    public OrdersResponse findById(@PathVariable UUID id) throws NotFoundException{
         return ordersController.findById(id);
     }
 
     @GetMapping
     @Operation(summary = "Find all orders")
+    @Cacheable(value = "orders_all", key = "'list'")
     public List<OrdersResponse> findAll() {
         return ordersController.findAll();
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an order by id")
+    @Caching(evict = {
+        @CacheEvict(value = "orders", key = "#id"),
+        @CacheEvict(value = "orders_all", allEntries = true)
+    })
     public void delete(@PathVariable UUID id) {
         ordersController.delete(id);
     }

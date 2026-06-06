@@ -13,12 +13,35 @@ public class OrdersResponse {
     private OrderStatus status;
     private UUID userId;
 
+    public OrdersResponse() {
+    }
+
     public OrdersResponse(Orders orders) {
         this.eventId = new EventResponse(orders.getEventId());
         this.id = orders.getId();
         this.orderDate = orders.getOrderDate();
         this.status = orders.getStatus();
         this.userId = orders.getUserId();
+    }
+
+    public void setEventId(EventResponse eventId) {
+        this.eventId = eventId;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public EventResponse getEventId() {

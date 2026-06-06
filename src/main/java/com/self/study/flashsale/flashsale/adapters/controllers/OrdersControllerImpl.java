@@ -2,8 +2,10 @@ package com.self.study.flashsale.flashsale.adapters.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
@@ -12,6 +14,7 @@ import com.self.study.flashsale.flashsale.application.useCase.orders.DeleteOrder
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrders;
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindOrderById;
 import com.self.study.flashsale.flashsale.application.useCase.orders.SaveOrder;
+import com.self.study.flashsale.flashsale.domain.models.Orders;
 
 @Component
 public class OrdersControllerImpl implements OrdersController {
@@ -39,13 +42,18 @@ public class OrdersControllerImpl implements OrdersController {
     }
 
     @Override
-    public OrdersResponse findById(UUID id) {
-        return new OrdersResponse(findOrder.execute(id));
+    public OrdersResponse findById(UUID id) throws NotFoundException{
+        Orders order = findOrder.execute(id);
+        if(order == null){
+            throw new NotFoundException();
+        }
+
+        return new OrdersResponse(order);
     }
 
     @Override
     public List<OrdersResponse> findAll() {
-        return findAllOrders.execute().stream().map(OrdersResponse::new).toList();
+        return findAllOrders.execute().stream().map(OrdersResponse::new).collect(Collectors.toList());
     }
 
     @Override

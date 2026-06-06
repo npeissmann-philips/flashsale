@@ -2,8 +2,10 @@ package com.self.study.flashsale.flashsale.adapters.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.EventRequest;
@@ -12,6 +14,7 @@ import com.self.study.flashsale.flashsale.application.useCase.events.DeleteEvent
 import com.self.study.flashsale.flashsale.application.useCase.events.FindAllEventsImpl;
 import com.self.study.flashsale.flashsale.application.useCase.events.FindEventByIdImpl;
 import com.self.study.flashsale.flashsale.application.useCase.events.SaveEvent;
+import com.self.study.flashsale.flashsale.domain.models.Events;
 
 @Component
 public class EventsControllerImpl implements EventsController {
@@ -39,13 +42,17 @@ public class EventsControllerImpl implements EventsController {
     }
 
     @Override
-    public EventResponse findById(UUID id) {
-        return new EventResponse(findEvent.execute(id));
+    public EventResponse findById(UUID id) throws NotFoundException {
+        Events event = findEvent.execute(id);
+        if (event == null) {
+            throw new NotFoundException();
+        }
+        return new EventResponse(event);
     }
 
     @Override
     public List<EventResponse> findAll() {
-        return findAllEvents.execute().stream().map(EventResponse::new).toList();
+        return findAllEvents.execute().stream().map(EventResponse::new).collect(Collectors.toList());
     }
 
     @Override

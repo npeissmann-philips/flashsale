@@ -13,12 +13,35 @@ public class EventResponse {
     private Integer remainingCapacity;
     private LocalDate eventDate;
 
+    public EventResponse() {
+    }
+
     public EventResponse(Events event) {
         this.id = event.getId();
         this.name = event.getName();
         this.totalCapacity = event.getTotalCapacity();
         this.remainingCapacity = event.getRemainingCapacity();
         this.eventDate = event.getEventDate();
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTotalCapacity(Integer totalCapacity) {
+        this.totalCapacity = totalCapacity;
+    }
+
+    public void setRemainingCapacity(Integer remainingCapacity) {
+        this.remainingCapacity = remainingCapacity;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
     }
 
     public UUID getId() {
