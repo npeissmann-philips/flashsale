@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.self.study.flashsale.flashsale.adapters.controllers.EventsController;
 import com.self.study.flashsale.flashsale.adapters.presenters.EventRequest;
@@ -31,24 +35,31 @@ public class EventWebController {
 
     @PostMapping
     @Operation(summary = "Save an event")
+    @CacheEvict(value = "events_all", allEntries = true)
     public EventResponse save(@RequestBody EventRequest eventRequest) {
         return eventController.save(eventRequest);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Find an event by id")
-    public EventResponse findById(@PathVariable UUID id) {
+    @Cacheable(value = "events", key = "#id")
+    public EventResponse findById(@PathVariable UUID id) throws NotFoundException {
         return eventController.findById(id);
     }
 
     @GetMapping
     @Operation(summary = "Find all events")
+    @Cacheable(value = "events_all", key = "'list'")
     public List<EventResponse> findAll() {
         return eventController.findAll();
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an event by id")
+    @Caching(evict = {
+        @CacheEvict(value = "events", key = "#id"),
+        @CacheEvict(value = "events_all", allEntries = true)
+    })
     public void delete(@PathVariable UUID id) {
         eventController.delete(id);
     }
