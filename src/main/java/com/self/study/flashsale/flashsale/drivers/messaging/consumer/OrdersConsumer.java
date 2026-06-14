@@ -27,6 +27,10 @@ public class OrdersConsumer {
             if (ordersAllCache != null) {
                 ordersAllCache.clear();
             }
+            Cache ordersPagedCache = cacheManager.getCache("orders_paged");
+            if (ordersPagedCache != null) {
+                ordersPagedCache.clear();
+            }
         } catch (Exception e) {
             System.err.println("Failed to process order: " + e.getMessage());
         }

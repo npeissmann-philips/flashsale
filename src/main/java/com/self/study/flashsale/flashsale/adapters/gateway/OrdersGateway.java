@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.self.study.flashsale.flashsale.domain.models.Orders;
+import com.self.study.flashsale.flashsale.domain.models.PagedResult;
 
 public interface OrdersGateway {
     Orders save(Orders order);
@@ -13,4 +14,6 @@ public interface OrdersGateway {
     void delete(UUID id);
 
     List<Orders> findAll();
+
+    PagedResult<Orders> findAllPaged(int page, int size);
 }

@@ -19,8 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import org.springframework.context.annotation.Profile;
+
 @Configuration
 @EnableCaching
+@Profile("!test")
 public class CacheConfig {
 
     @Bean
@@ -50,8 +53,10 @@ public class CacheConfig {
         
         cacheConfigurations.put("events", defaultCacheConfig.entryTtl(Duration.ofMinutes(5)));
         cacheConfigurations.put("events_all", defaultCacheConfig.entryTtl(Duration.ofMinutes(5)));
+        cacheConfigurations.put("events_paged", defaultCacheConfig.entryTtl(Duration.ofMinutes(5)));
         cacheConfigurations.put("orders", defaultCacheConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("orders_all", defaultCacheConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("orders_paged", defaultCacheConfig.entryTtl(Duration.ofMinutes(30)));
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultCacheConfig)
