@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +22,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import com.self.study.flashsale.flashsale.adapters.controllers.OrdersController;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersResponse;
+import com.self.study.flashsale.flashsale.adapters.presenters.PagedResponse;
 
 import com.self.study.flashsale.flashsale.drivers.messaging.producer.OrdersProducer;
 
@@ -61,11 +63,21 @@ public class OrdersWebController {
         return ordersController.findAll();
     }
 
+    @GetMapping("/paged")
+    @Operation(summary = "Find all orders paged")
+    @Cacheable(value = "orders_paged", key = "#page + '-' + #size")
+    public PagedResponse<OrdersResponse> findAllPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ordersController.findAllPaged(page, size);
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an order by id")
     @Caching(evict = {
         @CacheEvict(value = "orders", key = "#id"),
-        @CacheEvict(value = "orders_all", allEntries = true)
+        @CacheEvict(value = "orders_all", allEntries = true),
+        @CacheEvict(value = "orders_paged", allEntries = true)
     })
     public void delete(@PathVariable UUID id) {
         ordersController.delete(id);

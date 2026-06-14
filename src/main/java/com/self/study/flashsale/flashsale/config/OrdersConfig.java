@@ -11,6 +11,8 @@ import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrde
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrdersImpl;
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindOrderById;
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindOrderByIdImpl;
+import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrdersPaged;
+import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrdersPagedImpl;
 import com.self.study.flashsale.flashsale.application.useCase.orders.SaveOrder;
 import com.self.study.flashsale.flashsale.application.useCase.orders.SaveOrderImpl;
 
@@ -30,6 +32,11 @@ public class OrdersConfig {
     @Bean
     public FindAllOrders findAllOrders(OrdersGateway ordersGateway) {
         return new FindAllOrdersImpl(ordersGateway);
+    }
+
+    @Bean
+    public FindAllOrdersPaged findAllOrdersPaged(OrdersGateway ordersGateway) {
+        return new FindAllOrdersPagedImpl(ordersGateway);
     }
 
     @Bean

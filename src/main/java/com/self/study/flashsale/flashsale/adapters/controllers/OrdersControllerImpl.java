@@ -10,11 +10,14 @@ import org.springframework.stereotype.Component;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersResponse;
+import com.self.study.flashsale.flashsale.adapters.presenters.PagedResponse;
 import com.self.study.flashsale.flashsale.application.useCase.orders.DeleteOrder;
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrders;
+import com.self.study.flashsale.flashsale.application.useCase.orders.FindAllOrdersPaged;
 import com.self.study.flashsale.flashsale.application.useCase.orders.FindOrderById;
 import com.self.study.flashsale.flashsale.application.useCase.orders.SaveOrder;
 import com.self.study.flashsale.flashsale.domain.models.Orders;
+import com.self.study.flashsale.flashsale.domain.models.PagedResult;
 
 @Component
 public class OrdersControllerImpl implements OrdersController {
@@ -26,13 +29,16 @@ public class OrdersControllerImpl implements OrdersController {
     @Autowired
     private FindAllOrders findAllOrders;
     @Autowired
+    private FindAllOrdersPaged findAllOrdersPaged;
+    @Autowired
     private DeleteOrder deleteOrder;
 
     public OrdersControllerImpl(SaveOrder saveOrder, FindOrderById findOrder, FindAllOrders findAllOrders,
-            DeleteOrder deleteOrder) {
+            FindAllOrdersPaged findAllOrdersPaged, DeleteOrder deleteOrder) {
         this.saveOrder = saveOrder;
         this.findOrder = findOrder;
         this.findAllOrders = findAllOrders;
+        this.findAllOrdersPaged = findAllOrdersPaged;
         this.deleteOrder = deleteOrder;
     }
 
@@ -54,6 +60,21 @@ public class OrdersControllerImpl implements OrdersController {
     @Override
     public List<OrdersResponse> findAll() {
         return findAllOrders.execute().stream().map(OrdersResponse::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public PagedResponse<OrdersResponse> findAllPaged(int page, int size) {
+        PagedResult<Orders> pagedResult = findAllOrdersPaged.execute(page, size);
+        List<OrdersResponse> content = pagedResult.getContent().stream()
+                .map(OrdersResponse::new)
+                .toList();
+        return new PagedResponse<>(
+                content,
+                pagedResult.getTotalElements(),
+                pagedResult.getTotalPages(),
+                pagedResult.getPageNumber(),
+                pagedResult.getPageSize()
+        );
     }
 
     @Override

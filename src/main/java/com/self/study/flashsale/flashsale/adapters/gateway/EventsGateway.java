@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.self.study.flashsale.flashsale.domain.models.Events;
+import com.self.study.flashsale.flashsale.domain.models.PagedResult;
 
 public interface EventsGateway {
     Events save(Events event);
@@ -15,4 +16,6 @@ public interface EventsGateway {
     void delete(UUID id);
 
     List<Events> findAll();
+
+    PagedResult<Events> findAllPaged(int page, int size);
 }

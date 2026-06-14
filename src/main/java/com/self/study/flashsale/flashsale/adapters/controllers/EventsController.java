@@ -7,6 +7,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.EventRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.EventResponse;
+import com.self.study.flashsale.flashsale.adapters.presenters.PagedResponse;
 
 public interface EventsController {
     EventResponse save(EventRequest eventRequest);
@@ -14,6 +15,8 @@ public interface EventsController {
     EventResponse findById(UUID id) throws NotFoundException;
 
     List<EventResponse> findAll();
+
+    PagedResponse<EventResponse> findAllPaged(int page, int size);
 
     void delete(UUID id);
 }

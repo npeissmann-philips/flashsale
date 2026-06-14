@@ -10,6 +10,8 @@ import com.self.study.flashsale.flashsale.application.useCase.events.FindAllEven
 import com.self.study.flashsale.flashsale.application.useCase.events.FindAllEventsImpl;
 import com.self.study.flashsale.flashsale.application.useCase.events.FindEventById;
 import com.self.study.flashsale.flashsale.application.useCase.events.FindEventByIdImpl;
+import com.self.study.flashsale.flashsale.application.useCase.events.FindAllEventsPaged;
+import com.self.study.flashsale.flashsale.application.useCase.events.FindAllEventsPagedImpl;
 import com.self.study.flashsale.flashsale.application.useCase.events.SaveEvent;
 import com.self.study.flashsale.flashsale.application.useCase.events.SaveEventImpl;
 
@@ -29,6 +31,11 @@ public class EventsConfig {
     @Bean
     public FindAllEvents findAllEvents(EventsGateway eventsGateway) {
         return new FindAllEventsImpl(eventsGateway);
+    }
+
+    @Bean
+    public FindAllEventsPaged findAllEventsPaged(EventsGateway eventsGateway) {
+        return new FindAllEventsPagedImpl(eventsGateway);
     }
 
     @Bean
