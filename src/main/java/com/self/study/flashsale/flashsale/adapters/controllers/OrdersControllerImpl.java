@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersResponse;
@@ -44,7 +46,25 @@ public class OrdersControllerImpl implements OrdersController {
 
     @Override
     public OrdersResponse save(OrdersRequest orderRequest) {
-        return new OrdersResponse(saveOrder.execute(orderRequest.toDomain()));
+        int maxRetries = 5;
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                return new OrdersResponse(saveOrder.execute(orderRequest.toDomain()));
+            } catch (OptimisticLockingFailureException e) {
+                if (i == maxRetries - 1) {
+                    throw e;
+                }
+                try {
+                    // Backoff with some jitter: 50ms to 150ms
+                    long delay = 50 + (long) (Math.random() * 100);
+                    Thread.sleep(delay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
+        }
+        throw new RuntimeException("Unexpected exit from retry loop");
     }
 
     @Override
