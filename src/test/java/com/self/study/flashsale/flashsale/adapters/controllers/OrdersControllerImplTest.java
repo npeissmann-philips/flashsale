@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersRequest;
 import com.self.study.flashsale.flashsale.adapters.presenters.OrdersResponse;
@@ -75,6 +77,45 @@ class OrdersControllerImplTest {
         assertEquals(savedOrder.getId(), response.getId());
         assertEquals(OrderStatus.COMPLETED.name(), response.getStatus().name());
         verify(saveOrder).execute(any(Orders.class));
+    }
+
+    @Test
+    void shouldRetryAndEventuallySaveOrderSuccessfully() {
+        UUID eventId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        OrdersRequest request = new OrdersRequest(eventId, null, LocalDate.now(), OrderStatus.PENDING, userId);
+        
+        Events event = Events.builder().id(eventId).build();
+        Orders savedOrder = Orders.builder()
+                .id(UUID.randomUUID())
+                .eventId(event)
+                .userId(userId)
+                .orderDate(LocalDate.now())
+                .status(OrderStatus.COMPLETED)
+                .build();
+
+        when(saveOrder.execute(any(Orders.class)))
+                .thenThrow(new ObjectOptimisticLockingFailureException(Orders.class, "optimistic lock"))
+                .thenReturn(savedOrder);
+
+        OrdersResponse response = ordersController.save(request);
+
+        assertNotNull(response);
+        assertEquals(savedOrder.getId(), response.getId());
+        verify(saveOrder, times(2)).execute(any(Orders.class));
+    }
+
+    @Test
+    void shouldPropagateOptimisticLockingFailureWhenMaxRetriesExceeded() {
+        UUID eventId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        OrdersRequest request = new OrdersRequest(eventId, null, LocalDate.now(), OrderStatus.PENDING, userId);
+
+        when(saveOrder.execute(any(Orders.class)))
+                .thenThrow(new ObjectOptimisticLockingFailureException(Orders.class, "optimistic lock"));
+
+        assertThrows(ObjectOptimisticLockingFailureException.class, () -> ordersController.save(request));
+        verify(saveOrder, times(5)).execute(any(Orders.class));
     }
 
     @Test

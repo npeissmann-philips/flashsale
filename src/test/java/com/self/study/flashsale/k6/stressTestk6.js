@@ -13,8 +13,12 @@ export const options = {
 };
 
 export function setup() {
+    const now = new Date();
+    const dateTime = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    const eventName = `Stress Test Event - ${dateTime}`;
+    
     const payload = JSON.stringify({
-        name: 'Stress Test Event',
+        name: eventName,
         totalCapacity: 10,
         remainingCapacity: 10,
         eventDate: '2026-12-31'
