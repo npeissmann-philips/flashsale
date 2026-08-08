@@ -7,9 +7,15 @@ export const successCounter = new Counter('successful_requests');
 export const rejectCounter = new Counter('rejected_requests');
 
 export const options = {
-    vus: 10000,
+    /*vus: 10000,
     iterations: 10000,
-    maxDuration: '20m'
+    maxDuration: '20m'*/
+    stages: [
+            { duration: '10s', target: 100 },   // ramp up to 100 VUs
+            { duration: '30s', target: 1000 },  // scale to 1,000 VUs
+            { duration: '1m', target: 2000 },   // peak stress at 2,000 VUs
+            { duration: '10s', target: 0 },     // ramp down
+    ],
 };
 
 export function setup() {
