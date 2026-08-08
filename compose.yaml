@@ -11,12 +11,16 @@ services:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+      - MANAGEMENT_OTLP_TRACING_ENDPOINT=http://jaeger:4318/v1/traces
+      - MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
     depends_on:
       postgres:
         condition: service_healthy
       kafka:
         condition: service_started
       redis:
+        condition: service_started
+      jaeger:
         condition: service_started
 
   postgres:
@@ -88,3 +92,15 @@ services:
       - '3000:3000'
     depends_on:
       - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+
+
